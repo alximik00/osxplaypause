@@ -1,2 +1,2 @@
 all:
-	gcc -O3 -Wall -o osxplaypause.app/Contents/MacOS/osxplaypause -framework Cocoa -framework IOKit main.m
+	gcc -O3 -Wall -o build/playpause -framework Cocoa -framework IOKit main.m -v
