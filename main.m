@@ -1,8 +1,25 @@
 #import <IOKit/hidsystem/IOHIDLib.h>
 #import <IOKit/hidsystem/ev_keymap.h>
 #import <strings.h>
+#include <stdio.h>
+
+enum {
+  COMMAND_PLAY = 1,
+  COMMAND_NEXT = 2,
+  COMMAND_PREV = 3
+};
 
 int main(int argc, char *argv[]) {
+  int keyCode = NX_KEYTYPE_PLAY;
+
+  if (argc > 1) {
+    if (strcmp("next", argv[1])==0) {
+      keyCode = NX_KEYTYPE_NEXT;
+    } else if (strcmp("prev", argv[1])==0) {
+      keyCode = NX_KEYTYPE_PREVIOUS; 
+    }
+  }
+
   mach_port_t connect = 0;
   mach_port_t master_port;
   mach_port_t service;
@@ -22,12 +39,12 @@ int main(int argc, char *argv[]) {
 
   bzero(&eventData, sizeof(NXEventData));
   eventData.compound.subType = NX_SUBTYPE_AUX_CONTROL_BUTTONS;
-  eventData.compound.misc.L[0] = NX_KEYTYPE_PLAY << 16 | NX_KEYDOWN << 8;
+  eventData.compound.misc.L[0] = keyCode << 16 | NX_KEYDOWN << 8;
   IOHIDPostEvent(connect, NX_SYSDEFINED, location, &eventData, kNXEventDataVersion, 0, FALSE);
 
   bzero(&eventData, sizeof(NXEventData));
   eventData.compound.subType = NX_SUBTYPE_AUX_CONTROL_BUTTONS;
-  eventData.compound.misc.L[0] = NX_KEYTYPE_PLAY << 16 | NX_KEYUP << 8;
+  eventData.compound.misc.L[0] = keyCode << 16 | NX_KEYUP << 8;
   IOHIDPostEvent(connect, NX_SYSDEFINED, location, &eventData, kNXEventDataVersion, 0, FALSE);
 
   return 0;
