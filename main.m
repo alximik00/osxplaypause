@@ -10,14 +10,20 @@ enum {
 };
 
 int main(int argc, char *argv[]) {
-  int keyCode = NX_KEYTYPE_PLAY;
+  int keyCode = 0;
 
   if (argc > 1) {
     if (strcmp("next", argv[1])==0) {
       keyCode = NX_KEYTYPE_NEXT;
     } else if (strcmp("prev", argv[1])==0) {
       keyCode = NX_KEYTYPE_PREVIOUS; 
+    } else if (strcmp("play", argv[1])==0) {
+      keyCode = NX_KEYTYPE_PLAY;
     }
+  }
+
+  if (keyCode == 0) {
+    return 0;
   }
 
   mach_port_t connect = 0;
@@ -25,7 +31,7 @@ int main(int argc, char *argv[]) {
   mach_port_t service;
   mach_port_t iter;
 
-  IOMasterPort(bootstrap_port, &master_port);
+  IOMasterPort(MACH_PORT_NULL, &master_port);
   IOServiceGetMatchingServices(master_port, IOServiceMatching(kIOHIDSystemClass), &iter);
 
   service = IOIteratorNext(iter);
@@ -40,12 +46,12 @@ int main(int argc, char *argv[]) {
   bzero(&eventData, sizeof(NXEventData));
   eventData.compound.subType = NX_SUBTYPE_AUX_CONTROL_BUTTONS;
   eventData.compound.misc.L[0] = keyCode << 16 | NX_KEYDOWN << 8;
-  IOHIDPostEvent(connect, NX_SYSDEFINED, location, &eventData, kNXEventDataVersion, 0, FALSE);
+  IOHIDPostEvent(connect, NX_SYSDEFINED, location, &eventData, kNXEventDataVersion, 0xA, FALSE);
 
   bzero(&eventData, sizeof(NXEventData));
   eventData.compound.subType = NX_SUBTYPE_AUX_CONTROL_BUTTONS;
   eventData.compound.misc.L[0] = keyCode << 16 | NX_KEYUP << 8;
-  IOHIDPostEvent(connect, NX_SYSDEFINED, location, &eventData, kNXEventDataVersion, 0, FALSE);
+  IOHIDPostEvent(connect, NX_SYSDEFINED, location, &eventData, kNXEventDataVersion, 0xB, FALSE);
 
   return 0;
 }
