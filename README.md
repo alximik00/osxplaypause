@@ -8,3 +8,6 @@ launch an application.
 
 This application does one thing: it triggers the play/pause key that
 is found on Apple keyboards.
+
+## Updates since fork:
+* added ability to also trigger next and prev media actions.
